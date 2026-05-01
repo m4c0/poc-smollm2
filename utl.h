@@ -13,6 +13,8 @@ static wchar_t * utl_wstr_printable(utl_wstr_t str) {
   return dup;
 }
 
+#define utl_unreachable(...) do { fprintf(stderr, __VA_ARGS__); exit(1); } while (0)
+
 static void utl_assert(size_t n, const char * msg, const char * file, int line) {
   if (n) return;
   fprintf(stderr, "%s:%d: Assertion failed: %s\n", file, line, msg);
