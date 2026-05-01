@@ -3,7 +3,7 @@
 #include <string.h>
 #include <wchar.h>
 
-static utl_wstr_t vcb_map[50000] = {0};
+static utl_wstr_t vcb_map[49152] = {0};
 static wchar_t * vcb_mbstowcs(const char * u8, wchar_t * mb) {
   // This is equivalent to mbstowcs but we don't need to rely on
   // changing/restoring the multibyte locale
@@ -26,8 +26,7 @@ static wchar_t * vcb_utf8_to_wchar(const char * a, const char * b) {
   vcb_mbstowcs(b, vcb_mbstowcs(a, res));
   return res;
 }
-
-int main() {
+static void vcb_init() {
   char * file = utl_slurp("vocab.json");
 
   assert(*file++ == '{');
@@ -57,10 +56,16 @@ int main() {
     vcb_map[val].str = k;
     vcb_map[val].sz  = wcslen(k);
 
-    printf("%6d %ls\n", val, utl_wstr_printable(vcb_map[val]));
-
     if (*file == '}') break;
     assert(*file++ == ',');
+  }
+}
+
+int main() {
+  vcb_init();
+
+  for (int i = 0; i < 49152; i++) {
+    printf("%d %ls\n", i, utl_wstr_printable(vcb_map[i]));
   }
 
   mem_deinit();
