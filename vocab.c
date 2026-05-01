@@ -1,72 +1,19 @@
+#include "tkn.h"
 #include "utl.h"
 
-#include <string.h>
-#include <wchar.h>
-
-static utl_wstr_t vcb_map[49152] = {0};
-static wchar_t * vcb_mbstowcs(const char * u8, wchar_t * mb) {
-  // This is equivalent to mbstowcs but we don't need to rely on
-  // changing/restoring the multibyte locale
-  for (; *u8; u8++, mb++) {
-    if ((u8[0] & 0x80) == 0) {
-      *mb = *u8;
-      continue;
-    }
-    assert((u8[0] & 0xE0) == 0xC0 && (u8[1] & 0xC0) == 0x80 && "found unsupported char in vocab.bpe");
-    *mb = ((u8[0] & 0x1F) << 6) | (u8[1] & 0x3F);
-    u8++;
-  }
-  return mb;
-}
-static wchar_t * vcb_utf8_to_wchar(const char * a, const char * b) {
-  // Final string will never be greater than original. Since it can be smaller,
-  // we have to clear everything.
-  wchar_t * res = mem_alloc((strlen(a) + strlen(b) + 1) * sizeof(wchar_t));
-  // We concatenate both because the algo here only uses vocab.bpe for ranking.
-  vcb_mbstowcs(b, vcb_mbstowcs(a, res));
-  return res;
-}
-static void vcb_init() {
-  char * file = utl_slurp("vocab.json");
-
-  assert(*file++ == '{');
-  while (1) {
-    assert(*file++ == '"');
-    char * key = file;
-
-    while (*file != '"') {
-      // assuming vocab does not have \u....
-      if (*file == '\\') {
-        file++;
-        assert(*file == '\"' || *file == '\\');
-        file++;
-        continue;
-      }
-      file++;
-    }
-    *file = 0;
-    wchar_t * k = vcb_utf8_to_wchar(key, file++);
-
-    assert(*file++ == ':');
-
-    char * n = file;
-    while (*file >= '0' && *file <= '9') file++;
-    int val = atoi(n);
-
-    vcb_map[val].str = k;
-    vcb_map[val].sz  = wcslen(k);
-
-    if (*file == '}') break;
-    assert(*file++ == ',');
-  }
-}
-
 int main() {
+  byt_init();
+  bpe_init();
   vcb_init();
 
-  for (int i = 0; i < 49152; i++) {
-    printf("%d %ls\n", i, utl_wstr_printable(vcb_map[i]));
-  }
+  tkn_ids_t msg = tkn_encode("The quick brown fox jumped over the lazy dog.");
+
+  for (int i = 0; i < msg.sz; i++) printf("%d ", msg.ids[i]);
+  printf("\n");
+
+  char buf[1024];
+  int n = tkn_decode(msg, buf, 1024);
+  if (n) puts(buf);
 
   mem_deinit();
 }

@@ -84,7 +84,7 @@ static int compile(char * name) {
   char exe[1024];
   sprintf(exe, "%s" EXE_EXT, name);
 
-  if (mtime(src) < mtime(exe)) return 0;
+  //if (mtime(src) < mtime(exe)) return 0;
 
   char * args[] = { EXE(CC), "-Wall", "-g", "-IVulkan-Headers/include", "-o", exe, src, 0 };
   if (run(args)) return 1;

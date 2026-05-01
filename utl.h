@@ -6,6 +6,9 @@ typedef struct utl_wstr {
   const wchar_t * str;
   int sz;
 } utl_wstr_t;
+static utl_wstr_t utl_wstr_new(const wchar_t * str, int sz) {
+  return (utl_wstr_t) { str, sz };
+}
 static wchar_t * utl_wstr_printable(utl_wstr_t str) {
   wchar_t * dup = mem_alloc((str.sz + 1) * sizeof(wchar_t));
   for (int i = 0; i < str.sz; i++) dup[i] = str.str[i] < 0x80 ? str.str[i] : '?';

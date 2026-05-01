@@ -1,5 +1,6 @@
 #pragma once
 #include <stdlib.h>
+#include <stdio.h>
 
 // Alloc-and-forget routines. Mostly to keep track at the end of the process.
 
