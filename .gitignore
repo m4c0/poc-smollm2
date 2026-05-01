@@ -1,0 +1,6 @@
+build
+vocab
+
+*.dSYM
+*.json
+
