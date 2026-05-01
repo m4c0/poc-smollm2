@@ -53,6 +53,11 @@ static void bpe_init() {
     ptr++;
     buf = nxt + 1;
   }
+
+  assert(0 == wcscmp(bpe_map[8].str, L"\x120the"));
+  assert(bpe_map[8].sz == 4);
+  assert(0 == wcscmp(bpe_map[48899].str, L"ectable"));
+  assert(bpe_map[48899].sz == 7);
 }
 
 typedef struct bpe_list {

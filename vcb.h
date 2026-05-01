@@ -17,9 +17,9 @@ static void vcb_init() {
     for (char * p = file; *p && *p != '"'; p++, ksz++) {
       if (*p == '\\') p++;
     }
-    wchar_t * key = mem_alloc((ksz + 1) * sizeof(wchar_t));
+    char * key = mem_alloc((ksz + 1) * sizeof(wchar_t));
 
-    wchar_t * k = key;
+    char * k = key;
     while (*file != '"') {
       // assuming vocab does not have \u
       if (*file == '\\') {
@@ -39,11 +39,21 @@ static void vcb_init() {
     assert(id >= 0);
     assert(id < 49152);
 
-    vcb_map[id] = utl_wstr_new(key, ksz);
+    vcb_map[id].str = bpe_utf8_to_wchar(key, k);
+    vcb_map[id].sz = wcslen(vcb_map[id].str);
 
     if (*file == '}') break;
     assert(*file++ == ',');
   }
+
+  assert(0 == wcscmp(vcb_map[0].str, L"<|endoftext|>"));
+  assert(13 == vcb_map[0].sz);
+  assert(0 == wcscmp(vcb_map[76].str, L"\\"));
+  assert(1 == vcb_map[76].sz);
+  assert(0 == wcscmp(vcb_map[252].str, L"\x120t"));
+  assert(2 == vcb_map[252].sz);
+  assert(0 == wcscmp(vcb_map[2365].str, L"\x120quick"));
+  assert(6 == vcb_map[2365].sz);
 }
 static int vcb_find_id(utl_wstr_t str) {
   for (int tkn = 0; tkn < 49152; tkn++) {
