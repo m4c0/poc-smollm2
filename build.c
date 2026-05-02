@@ -99,7 +99,7 @@ int main(int argc, char ** argv) {
   // if (shader("gpt2-smxv2.comp")) return 1;
 
   if (compile("vocab"     )) return 1;
-  // if (compile("safetensor")) return 1;
+  if (compile("safetensor")) return 1;
   // if (compile("vulkan"    )) return 1;
   // if (compile("gpt2"      )) return 1;
   // if (compile("gpt2-naive")) return 1;

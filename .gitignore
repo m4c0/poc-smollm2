@@ -1,7 +1,9 @@
 build
+safetensor
 vocab
 
 *.dSYM
 *.json
+*.safetensors
 *.txt
 
