@@ -21,6 +21,13 @@ int main() {
 
   list_tensors();
 
+  float * f = malloc(49152 * 576 * sizeof(float));
+  sft_get("model.embed_tokens.weight", f, 49152, 576, 0, 0);
+
+  for (int i = 0; i < 3; i++) printf("f[%d] = %f\n", i, f[i]);
+  for (int i = 49149; i < 49152; i++) printf("f[%d] = %f\n", i, f[i]);
+  for (int i = 28311549; i < 28311552; i++) printf("f[%d] = %f\n", i, f[i]);
+
   mem_deinit();
 
   (void)utl_wstr_new;
