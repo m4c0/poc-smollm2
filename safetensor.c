@@ -31,7 +31,7 @@ int main() {
   sft_get("model.embed_tokens.weight", f, 49152, 576, 0, 0);
 
   for (int i = 0; i < 3; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
-  for (int i = 49152 - 3; i < 49152; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
+  for (int i = 576 - 3; i < 576; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
   for (int i = 49152*576 - 3; i < 49152*576; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
 
   mem_deinit();
