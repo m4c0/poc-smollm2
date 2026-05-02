@@ -3,7 +3,9 @@ safetensor
 vocab
 
 *.dSYM
+*.exe
 *.json
+*.pdb
 *.safetensors
 *.txt
 

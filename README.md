@@ -24,9 +24,9 @@ You need these files:
 Using `curl`, something like:
 
 ```bash
-curl -L -o merges.txt https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/merges.txt?download=true
-curl -L -o model.safetensors https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/model.safetensors?download=true
-curl -L -o vocab.json https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/vocab.json?download=true
+curl -L -o merges.txt https://huggingface.co/HuggingFaceTB/SmolLM2-135M/resolve/main/merges.txt
+curl -L -o model.safetensors https://huggingface.co/HuggingFaceTB/SmolLM2-135M/resolve/main/model.safetensors?download=true
+curl -L -o vocab.json https://huggingface.co/HuggingFaceTB/SmolLM2-135M/resolve/main/vocab.json?download=true
 ```
 
 Compiling each C file is a simple `cc` invocation. But, if you have access to
