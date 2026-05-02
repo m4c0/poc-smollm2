@@ -16,17 +16,23 @@ static void list_tensors() {
   }
 }
 
+static float bf16_to_f32(uint16_t n) {
+  // GLSL equivalent of: f = uintBitsToFloat(uint(n) << 16);
+  uint32_t i = (uint32_t)n << 16;
+  return *(float *)&i;
+}
+
 int main() {
   sft_init();
 
   list_tensors();
 
-  float * f = malloc(49152 * 576 * sizeof(float));
+  uint16_t * f = malloc(49152 * 576 * sizeof(float));
   sft_get("model.embed_tokens.weight", f, 49152, 576, 0, 0);
 
-  for (int i = 0; i < 3; i++) printf("f[%d] = %f\n", i, f[i]);
-  for (int i = 49149; i < 49152; i++) printf("f[%d] = %f\n", i, f[i]);
-  for (int i = 28311549; i < 28311552; i++) printf("f[%d] = %f\n", i, f[i]);
+  for (int i = 0; i < 3; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
+  for (int i = 49152 - 3; i < 49152; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
+  for (int i = 49152*576 - 3; i < 49152*576; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
 
   mem_deinit();
 

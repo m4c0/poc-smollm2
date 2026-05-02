@@ -70,7 +70,7 @@ static sft_tensor_t sft_find(const char * key) {
   exit(1);
 }
 
-static void sft_get(const char * tensor, float * data, unsigned s0, unsigned s1, unsigned s2, unsigned s3) {
+static void sft_get(const char * tensor, void * data, unsigned s0, unsigned s1, unsigned s2, unsigned s3) {
   sft_tensor_t t = sft_find(tensor);
   assert(s0 == t.shape[0]);
   assert(s1 == t.shape[1]);
