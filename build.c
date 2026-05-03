@@ -99,6 +99,7 @@ int main(int argc, char ** argv) {
   if (shader("vulkan.comp")) return 1;
 
   if (shader("embed.comp")) return 1;
+  if (shader("inpnr.comp")) return 1;
 
   if (compile("vocab"     )) return 1;
   if (compile("safetensor")) return 1;

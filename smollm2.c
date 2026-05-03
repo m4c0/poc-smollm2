@@ -41,6 +41,12 @@ static void dump_output(vlk_buffer_t b, unsigned sz) {
   vkUnmapMemory(vlk_dev, b.mem);
 }
 
+static float bf16_to_f32(uint16_t n) {
+  // GLSL equivalent of: f = uintBitsToFloat(uint(n) << 16);
+  uint32_t i = (uint32_t)n << 16;
+  return *(float *)&i;
+}
+
 int main() {
   byt_init();
   bpe_init();
@@ -51,17 +57,24 @@ int main() {
   vlk_buffer_t b_indir = create_indirect_buffer();
 
   vlk_ppl_t p_embed = vlk_create_pipeline("embed.comp.spv", 4, 0);
+  vlk_ppl_t p_inpnr = vlk_create_pipeline("inpnr.comp.spv", 2, 0);
 
-  sft_list_t b_embed = sft_load_single("embed_tokens", 49152, 576);
+  sft_list_t b_embed = sft_load_single("embed_tokens",    49152, 576);
+  sft_list_t b_inpnr = sft_load_layers("input_layernorm",   576,   0);
 
-  vlk_buffer_t b_xinpt = vlk_create_local_buffer(576, 0);
+  vlk_buffer_t b_xinpt = vlk_create_host_buffer(576, 0);
 
   unsigned tksz = 0;
   vlk_buffer_t b_input = load_input(txt, &tksz);
 
   VkCommandBuffer cb = vlk_allocate_command_buffer();
   vlk_begin_command_buffer(cb);
+
   vlk_dispatch(cb, p_embed, 1, 1, 1, b_indir, b_input, b_embed, b_xinpt);
+  for (int i = 0; i < 1; i++) {
+    vlk_dispatch(cb, p_inpnr, 1, 1, 1, b_xinpt, b_inpnr.data[i]);
+  }
+
   vlk_end_command_buffer(cb);
   vlk_submit(cb);
 
@@ -69,6 +82,13 @@ int main() {
 
   dump_output(b_input, tksz);
 
+  uint16_t * f;
+  _(vkMapMemory(vlk_dev, b_xinpt.mem, 0, VK_WHOLE_SIZE, 0, (void **)&f));
+  for (int i = 0; i < 3; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
+  for (int i = 576 - 3; i < 576; i++) printf("f[%d] = %f\n", i, bf16_to_f32(f[i]));
+  vkUnmapMemory(vlk_dev, b_xinpt.mem);
+
   vlk_deinit();
   mem_deinit();
+  (void)vlk_create_local_buffer;
 }
