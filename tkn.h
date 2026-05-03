@@ -39,12 +39,7 @@ static unsigned tkn_next_pptoken_len(const char * b) {
   return bs - b;
 }
 
-typedef struct tkn_ids {
-  uint16_t * ids;
-  int sz;
-} tkn_ids_t;
-static tkn_ids_t tkn_encode(const char * txt) {
-  uint16_t * ids = mem_alloc(sizeof(uint16_t) * 8192);
+static int tkn_encode(uint16_t * ids, const char * txt) {
   int idx = 0;
 
   unsigned len;
@@ -59,12 +54,12 @@ static tkn_ids_t tkn_encode(const char * txt) {
     txt += len;
   }
 
-  return (tkn_ids_t) { ids, idx };
+  return idx;
 }
-static int tkn_decode(tkn_ids_t ts, char * buf, int bsz) {
+static int tkn_decode(uint16_t * ids, unsigned sz, char * buf, int bsz) {
   int total = 0;
-  for (int i = 0; i < ts.sz && i < bsz; i++) {
-    utl_wstr_t tk = vcb_map[ts.ids[i]];
+  for (int i = 0; i < sz && i < bsz; i++) {
+    utl_wstr_t tk = vcb_map[ids[i]];
     total += byt_decode_bytes(tk, buf + total, bsz - total);
   }
   if (total < bsz) buf[total] = 0;
