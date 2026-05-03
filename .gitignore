@@ -1,8 +1,11 @@
 build
 safetensor
+smollm2
 vocab
 vulkan
 
+*.comp
+*.dylib
 *.dSYM
 *.exe
 *.json
