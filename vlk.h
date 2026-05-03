@@ -5,6 +5,7 @@
 #include "volk.h"
 #include "Vulkan-Headers/include/vulkan/vulkan_core.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 
 static VkInstance vlk_ins;
@@ -306,6 +307,22 @@ static void vlk_begin_command_buffer(VkCommandBuffer cb) {
 }
 static void vlk_end_command_buffer(VkCommandBuffer cb) {
   vkEndCommandBuffer(cb);
+}
+
+static void vlk_bind(VkCommandBuffer cb, vlk_ppl_t ppl, va_list args) {
+  VkDescriptorSet dsets[8];
+  for (int i = 0; i < ppl.sets; i++) dsets[i] = va_arg(args, vlk_buffer_t).dset;
+
+  vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_COMPUTE, ppl.ppl);
+  vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_COMPUTE, ppl.pl, 0, ppl.sets, dsets, 0, NULL);
+}
+static void vlk_dispatch(VkCommandBuffer cb, vlk_ppl_t ppl, unsigned d1, unsigned d2, unsigned d3, ...) {
+  va_list args;
+  va_start(args, d3);
+  vlk_bind(cb, ppl, args);
+  va_end(args);
+
+  vkCmdDispatch(cb, d1, d2, d3);
 }
 
 static void vlk_submit(VkCommandBuffer cb) {

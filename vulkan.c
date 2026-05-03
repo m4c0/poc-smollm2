@@ -13,11 +13,7 @@ int main(int argc, char ** argv) {
   uint16_t inp[2] = { 0x4286, 0 }; // 67,0 in BF16
   vkCmdUpdateBuffer(cb, bin.buf, 0, 4, &inp);
 
-  VkDescriptorSet dsets[2] = { bin.dset, bout.dset };
-  vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_COMPUTE, ppl.pl, 0, 2, dsets, 0, NULL);
-
-  vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_COMPUTE, ppl.ppl);
-  vkCmdDispatch(cb, 1, 1, 1);
+  vlk_dispatch(cb, ppl, 1, 1, 1, bin, bout);
 
   vlk_end_command_buffer(cb);
   vlk_submit(cb);
@@ -27,7 +23,7 @@ int main(int argc, char ** argv) {
   uint16_t * s;
   _(vkMapMemory(vlk_dev, bout.mem, 0, VK_WHOLE_SIZE, 0, (void **)&s));
   uint32_t f = (uint32_t)s[0] << 16;
-  printf("%f\n", *(float *)&f);
+  printf("%.1f\n", *(float *)&f);
   vkUnmapMemory(vlk_dev, bout.mem);
 
   vlk_deinit();
