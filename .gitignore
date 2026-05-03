@@ -1,6 +1,7 @@
 build
 safetensor
 vocab
+vulkan
 
 *.dSYM
 *.exe
