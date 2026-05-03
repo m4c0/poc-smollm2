@@ -3,14 +3,14 @@
 int main(int argc, char ** argv) {
   vlk_init();
 
-  vlk_buffer_t bin = vlk_create_host_buffer(1, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
-  vlk_buffer_t bout = vlk_create_host_buffer(1, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+  vlk_buffer_t bin = vlk_create_host_buffer(2, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+  vlk_buffer_t bout = vlk_create_host_buffer(2, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
   vlk_ppl_t ppl = vlk_create_pipeline("vulkan.comp.spv", 2, 0);
 
   VkCommandBuffer cb = vlk_allocate_command_buffer();
   vlk_begin_command_buffer(cb);
 
-  float inp = 67;
+  uint16_t inp[2] = { 0x4286, 0 }; // 67,0 in BF16
   vkCmdUpdateBuffer(cb, bin.buf, 0, 4, &inp);
 
   VkDescriptorSet dsets[2] = { bin.dset, bout.dset };
@@ -24,9 +24,10 @@ int main(int argc, char ** argv) {
 
   vkDeviceWaitIdle(vlk_dev);
 
-  float * f;
-  _(vkMapMemory(vlk_dev, bout.mem, 0, VK_WHOLE_SIZE, 0, (void **)&f));
-  printf("%f\n", f[0]);
+  uint16_t * s;
+  _(vkMapMemory(vlk_dev, bout.mem, 0, VK_WHOLE_SIZE, 0, (void **)&s));
+  uint32_t f = (uint32_t)s[0] << 16;
+  printf("%f\n", *(float *)&f);
   vkUnmapMemory(vlk_dev, bout.mem);
 
   vlk_deinit();

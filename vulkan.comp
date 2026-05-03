@@ -1,12 +1,15 @@
 #version 450
+#extension GL_EXT_shader_16bit_storage : require
 
 layout(binding=0, set=0) readonly buffer in0 {
-  float a[];
+  uint16_t a[];
 };
 layout(binding=0, set=1) buffer in1 {
-  float b[];
+  uint16_t b[];
 };
 
 void main() {
-  b[gl_GlobalInvocationID.x] = 2 + a[gl_GlobalInvocationID.x];
+  float f = uintBitsToFloat(uint(a[gl_GlobalInvocationID.x]) << 16);
+  uint u = floatBitsToUint(2 + f);
+  b[gl_GlobalInvocationID.x] = uint16_t(u >> 16);
 }

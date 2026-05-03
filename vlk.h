@@ -72,17 +72,26 @@ static void vlk_create_device() {
     .queueFamilyIndex = vlk_qf,
   };
 
+  VkPhysicalDevice16BitStorageFeatures sdfinfo = {
+    .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES,
+    .storageBuffer16BitAccess           = VK_TRUE,
+    .uniformAndStorageBuffer16BitAccess = VK_TRUE,
+  };
+
   VkDeviceCreateInfo info = (VkDeviceCreateInfo) {
     .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+    .pNext = &sdfinfo,
     .queueCreateInfoCount = 1,
     .pQueueCreateInfos = &q,
-    .enabledExtensionCount = 0,
+    .enabledExtensionCount = 2,
     .ppEnabledExtensionNames = (const char *[]) {
+      "VK_KHR_16bit_storage",
+      "VK_KHR_storage_buffer_storage_class",
       "VK_KHR_portability_subset"
     },
   };
 #ifdef __APPLE__
-  info.enabledExtensionCount = 1;
+  info.enabledExtensionCount++;
 #endif
 
   _(vkCreateDevice(vlk_pd, &info, NULL, &vlk_dev));
@@ -211,18 +220,18 @@ static vlk_buffer_t vlk_create_buffer(VkDeviceSize sz, VkMemoryPropertyFlags mem
     if ((flags & mem_flags) != mem_flags) continue;
 
     vlk_buffer_t res;
-    res.size = sz * sizeof(float);
+    res.size = sz * sizeof(uint16_t);
 
     VkBufferCreateInfo buf = {
       .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-      .size = sz * sizeof(float),
+      .size = sz * sizeof(uint16_t),
       .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | ex_flags,
     };
     _(vkCreateBuffer(vlk_dev, &buf, NULL, &res.buf));
 
     VkMemoryAllocateInfo mem = {
       .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-      .allocationSize = sz * sizeof(float),
+      .allocationSize = sz * sizeof(uint16_t),
       .memoryTypeIndex = i,
     };
     _(vkAllocateMemory(vlk_dev, &mem, NULL, &res.mem));
