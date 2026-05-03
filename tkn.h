@@ -5,6 +5,7 @@
 #include "vcb.h"
 
 #include <ctype.h>
+#include <stdint.h>
 
 static unsigned tkn_next_pptoken_len(const char * b) {
   if (!*b) return 0;
@@ -39,11 +40,11 @@ static unsigned tkn_next_pptoken_len(const char * b) {
 }
 
 typedef struct tkn_ids {
-  int * ids;
+  uint16_t * ids;
   int sz;
 } tkn_ids_t;
 static tkn_ids_t tkn_encode(const char * txt) {
-  int * ids = mem_alloc(sizeof(int) * 1024);
+  uint16_t * ids = mem_alloc(sizeof(uint16_t) * 8192);
   int idx = 0;
 
   unsigned len;
