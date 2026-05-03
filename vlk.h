@@ -93,7 +93,7 @@ static void vlk_create_device() {
 
 static VkShaderModule vlk_create_shader_module(const char * name) {
   FILE * f = fopen(name, "rb");
-  assert(f);
+  assert(f && "shader not found");
   assert(0 == fseek(f, 0, SEEK_END));
   long sz = ftell(f);
   assert(sz && (sz % 4 == 0));

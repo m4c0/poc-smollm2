@@ -8,5 +8,6 @@ vulkan
 *.json
 *.pdb
 *.safetensors
+*.spv
 *.txt
 

@@ -96,7 +96,7 @@ static int compile(char * name) {
 int main(int argc, char ** argv) {
   if (argc != 1) return (usage(), 1);
 
-  // if (shader("gpt2-smxv2.comp")) return 1;
+  if (shader("vulkan.comp")) return 1;
 
   if (compile("vocab"     )) return 1;
   if (compile("safetensor")) return 1;
