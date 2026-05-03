@@ -1,5 +1,6 @@
 #pragma once
 #include "utl.h"
+#include "vlk.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -81,4 +82,31 @@ static void sft_get(const char * tensor, void * data, unsigned s0, unsigned s1, 
   assert(fread(data, t.sz, 1, sft_file));
 }
 
+typedef struct sft_list {
+  vlk_buffer_t data[30];
+} sft_list_t;
+static vlk_buffer_t sft_load(const char * key, unsigned s0, unsigned s1) {
+  vlk_buffer_t b = vlk_create_host_buffer(s0 * (s1 == 0 ? 1 : s1), 0);
 
+  char name[256]; snprintf(name, 256, "model.%s.weight", key);
+
+  void * ptr;
+  _(vkMapMemory(vlk_dev, b.mem, 0, VK_WHOLE_SIZE, 0, &ptr));
+  sft_get(name, ptr, s0, s1, 0, 0);
+  vkUnmapMemory(vlk_dev, b.mem);
+
+  return b;
+}
+static sft_list_t sft_load_single(const char * key, unsigned s0, unsigned s1) {
+  sft_list_t res = {0};
+  res.data[0] = sft_load(key, s0, s1);
+  return res;
+}
+static sft_list_t sft_load_layers(const char * key, unsigned s0, unsigned s1) {
+  sft_list_t res = {0};
+  for (int i = 0; i < 30; i++) {
+    char lkey[256]; snprintf(lkey, 256, "layers.%d.%s", i, key);
+    res.data[i] = sft_load(lkey, s0, s1);
+  }
+  return res;
+}
