@@ -74,6 +74,21 @@ int main() {
   for (int i = 0; i < 1; i++) {
     vlk_global_barrier(cb);
     vlk_dispatch(cb, p_inpnr, 1, 1, 1, b_xinpt, b_inpnr.data[i]);
+
+    vlk_global_barrier(cb);
+    // x @ q.T // x @ k.T // x @ v.T
+    // RoPE (once for x@q, once for x@k)
+    // -- angle = tksz-1 * pow(rope_theta, -2 * i / 64)
+    // -- rope_theta = 100k
+    // -- i in [0;31]
+    // -- 64 is head size
+    // -- x1 = x[0;31], x2 = x[32;63]
+    // -- x1_rot = x1 cos(a) - x2 sin(a)
+    // -- x2_rot = x1 sin(a) + x2 cos(a)
+    // "cache" kv
+    // q @ k.T / sqrt(64) (q[012] -> k[0] etc)
+    // softmax
+    // xinpt + x @ o.T
   }
 
   vlk_end_command_buffer(cb);
