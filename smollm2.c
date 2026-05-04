@@ -72,6 +72,15 @@ int main() {
 
   vlk_dispatch(cb, p_embed, 1, 1, 1, b_indir, b_input, b_embed, b_xinpt);
   for (int i = 0; i < 1; i++) {
+    VkMemoryBarrier m = {
+      .sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+      .srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT,
+      .dstAccessMask = VK_ACCESS_MEMORY_READ_BIT,
+    };
+    vkCmdPipelineBarrier(cb,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        0, 1, &m, 0, NULL, 0, NULL);
     vlk_dispatch(cb, p_inpnr, 1, 1, 1, b_xinpt, b_inpnr.data[i]);
   }
 
