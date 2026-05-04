@@ -358,6 +358,8 @@ static void vlk_init() {
   vlk_create_query_pool();
 }
 static void vlk_deinit() {
+  vkDeviceWaitIdle(vlk_dev);
+
   uint64_t n = 0;
   for (int i = 0; i < vlk_buf_cache_idx; i++) n += vlk_buf_cache[i].size;
   fprintf(stderr, "\nTotal buffer size: %lluMB\n", n / (1024 * 1024));
