@@ -55,4 +55,5 @@ int main() {
   (void)vlk_dispatch;
   (void)vlk_end_command_buffer;
   (void)vlk_submit;
+  (void)vlk_global_barrier;
 }

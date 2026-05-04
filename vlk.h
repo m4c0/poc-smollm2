@@ -324,6 +324,18 @@ static void vlk_dispatch(VkCommandBuffer cb, vlk_ppl_t ppl, unsigned d1, unsigne
 
   vkCmdDispatch(cb, d1, d2, d3);
 }
+static void vlk_global_barrier(VkCommandBuffer cb) {
+  // This barrier is implicit in certain architectures
+  VkMemoryBarrier m = {
+    .sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER,
+    .srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT,
+    .dstAccessMask = VK_ACCESS_MEMORY_READ_BIT,
+  };
+  vkCmdPipelineBarrier(cb,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+      0, 1, &m, 0, NULL, 0, NULL);
+}
 
 static void vlk_submit(VkCommandBuffer cb) {
   VkSubmitInfo info = {

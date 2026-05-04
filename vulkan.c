@@ -33,4 +33,5 @@ int main(int argc, char ** argv) {
   (void)utl_wstr_printable;
   (void)utl_slurp;
   (void)vlk_create_local_buffer;
+  (void)vlk_global_barrier;
 }
