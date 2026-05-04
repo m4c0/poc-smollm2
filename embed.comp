@@ -1,0 +1,19 @@
+#version 450
+#extension GL_EXT_shader_16bit_storage : require
+
+layout(binding=0, set=0) readonly buffer b0 { uint16_t b_indir[]; };
+layout(binding=0, set=1) readonly buffer b1 { uint16_t b_input[]; };
+layout(binding=0, set=2) readonly buffer b2 { uint16_t b_embed[]; };
+layout(binding=0, set=3)          buffer b3 { uint16_t b_xinpt[]; };
+
+layout(local_size_x = 576) in;
+
+#define F(S) uintBitsToFloat(uint(S) << 16)
+#define S(F) uint16_t(floatBitsToUint(F) >> 16)
+
+// x = wte[input[i]]
+void main() {
+  uint tkn = uint(b_input[uint(b_indir[0]) - 1]);
+  uint id = tkn * 576 + gl_LocalInvocationID.x;
+  b_xinpt[gl_LocalInvocationID.x] = b_embed[id];
+}

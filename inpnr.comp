@@ -1,0 +1,31 @@
+#version 450
+#extension GL_EXT_shader_16bit_storage : require
+
+layout(binding=0, set=0)          buffer b0 { uint16_t b_xinpt[]; };
+layout(binding=0, set=1) readonly buffer b1 { uint16_t b_inpnr[]; };
+
+layout(local_size_x = 576) in;
+
+shared float x[576];
+shared float mean;
+
+#define F(S) uintBitsToFloat(uint(S) << 16)
+#define S(F) uint16_t(floatBitsToUint(F) >> 16)
+
+// x * norm / np.sqrt(np.mean(x * x) + 1e-5)
+void main() {
+  uint id = gl_LocalInvocationID.x;
+
+  x[id] = F(b_xinpt[id]);
+  memoryBarrierShared();
+
+  if (id == 0) {
+    mean = 0;
+    for (int i = 0; i < 576; i++) mean += x[i] * x[i];
+    mean /= 576;
+  }
+  memoryBarrierShared();
+
+  x[id] *= F(b_inpnr[id]) / sqrt(mean + 1e-5);
+  b_xinpt[id] = S(x[id]);
+}
